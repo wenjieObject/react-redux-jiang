@@ -147,5 +147,158 @@ npm install react-redux
 
 还需要安装redux
 
+### 3.1.reducer
+
+```js
+
+const initState = {
+    value: 0
+};
+
+const reducer = (state = initState, action) => {
+
+    const value = state.value + 1
+    switch (action.type) {
+        case "send_type":
+            return Object.assign({}, state, action)
+        case "add":
+            return { value }
+        default:
+            return state
+
+    };
+}
+
+module.exports = { reducer }
+```
+
+### 3.2.store
+
+```js
+
+import {createStore} from "redux"
+
+//导入reducer
+import {reducer} from "../reducer/index"
+
+//构建store
+const store=createStore(reducer)
+
+
+export default store;
+
+```
+
+
+
+### 3.3.Provider
+
+
+
+Provider需要包裹组件最外层，Provider包裹的组件可以通过connect加强
+
+```js
+import React from 'react';
+import './App.css';
+import PageLeft from './pages/pageleft'
+import PageRight from './pages/pageright'
+import { Provider } from 'react-redux'
+import store from './store'
+
+function App() {
+  return (
+    <div>
+      <Provider store={store}>
+        <PageLeft />
+        <PageRight />
+      </Provider>
+    </div>
+  );
+}
+
+export default App;
+
+```
+
+
+
+### 3.4. 发送action组件
+
+
+
+实现connect的第二个参数mapDispatchToProps，connect加强组件，通过this.props获取action
+
+```js
+import React, { Component } from 'react';
+import {connect} from 'react-redux'
+
+class PageLeft extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {  }
+    }
+
+    handleClick=()=>{
+        console.log(this.props)
+        this.props.add()
+    }
+
+    render() { 
+        return ( 
+        <>
+        <button onClick={this.handleClick}> +++++  </button>
+        </> );
+    }
+}
+
+const mapDispatchToProps=(dispatch)=>{
+    return {
+        add:()=>{
+            dispatch({type:"add"})
+        }
+    }
+}
+ 
+ 
+export default connect(null,mapDispatchToProps)(PageLeft);
+```
+
+
+
+### 3.5. 接收组件
+
+
+
+接收connect第一个参数，mapStateToProps（state），state是reducer返回的数据
+
+```js
+import React, { Component } from 'react';
+import {connect} from 'react-redux'
+
+class PageRight extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {}
+    }
+
+    componentDidMount(){
+        console.log("props",this.props)
+    }
+    render() {
+        return (
+            <>
+                {this.props.value}
+            </>);
+    }
+}
+
+const mapStateToProps=(state)=>{
+    console.log("state",state)
+    return state
+}
+
+export default connect(mapStateToProps)(PageRight);
+```
+
 
 
